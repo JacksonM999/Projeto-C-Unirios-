@@ -6,7 +6,7 @@
 // Definir a estrutura da ficha de matrícula
 typedef struct Matricula {
     int id;
-    char habil[50], cpf[20], renach[20], nome[50];  // Nome agora é o último
+    char habil[50], cpf[20], renach[20], nome[50]; 
     struct Matricula* prox;
 } Matricula;
 
@@ -31,7 +31,7 @@ Matricula* criarMat(int id, const char* habil, const char* cpf, const char* rena
     strcpy(novo->habil, habil);
     strcpy(novo->cpf, cpf);
     strcpy(novo->renach, renach);
-    strcpy(novo->nome, nome);  // Nome agora é o último
+    strcpy(novo->nome, nome);
     novo->prox = NULL;
     return novo;
 }
