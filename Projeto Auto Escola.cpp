@@ -3,10 +3,10 @@
 #include <string.h>
 #include <locale.h>
 
-// Definir a estrutura da ficha de matricula
+// Definir a estrutura da ficha de matr√≠cula
 typedef struct Matricula {
-    int id, renach;
-    char nome[50], habil[50], cpf[15];
+    int id;
+    char habil[50], cpf[20], renach[20], nome[50];  // Nome agora √© o √∫ltimo
     struct Matricula* prox;
 } Matricula;
 
@@ -14,41 +14,41 @@ typedef struct Matricula {
 typedef struct File {
     Matricula* inicio;
     Matricula* fim;
-    int proxId; // Vari·vel para armazenar o prÛximo id
+    int proxId; // Vari√°vel para armazenar o pr√≥ximo id
 } File;
 
-// DeclaraÁ„o da funÁ„o loadFromFile (importante para que ela seja reconhecida no cÛdigo)
+// Declara√ß√£o da fun√ß√£o loadFromFile (importante para que ela seja reconhecida no c√≥digo)
 void loadFromFile(File* file);
 
-// FunÁ„o para criar uma nova matricula
-Matricula* criarMat(int id, const char* cpf, int renach, const char* nome, const char* habil) {
+// Fun√ß√£o para criar uma nova matr√≠cula
+Matricula* criarMat(int id, const char* habil, const char* cpf, const char* renach, const char* nome) {
     Matricula* novo = (Matricula*)malloc(sizeof(Matricula));
     if (novo == NULL) {
-        fprintf(stderr, "Erro ao alocar memÛria.\n");
+        fprintf(stderr, "Erro ao alocar mem√≥ria.\n");
         exit(1);
     }
     novo->id = id;
-    strcpy(novo->cpf, cpf);
-    novo->renach = renach;
-    strcpy(novo->nome, nome);
     strcpy(novo->habil, habil);
+    strcpy(novo->cpf, cpf);
+    strcpy(novo->renach, renach);
+    strcpy(novo->nome, nome);  // Nome agora √© o √∫ltimo
     novo->prox = NULL;
     return novo;
 }
 
-// FunÁ„o para iniciar a fila
+// Fun√ß√£o para iniciar a fila
 void startFile(File* file) {
     file->inicio = NULL;
     file->fim = NULL;
-    file->proxId = 1; // Inicia com 1, mas pode ser alterado se houver matrÌculas carregadas
+    file->proxId = 1; // O ID inicia com 1, mas pode ser alterado se houver outras matr√≠culas carregadas
 
-    // Carregar as matrÌculas do arquivo, para garantir que o proxId ser· correto
+    // Carregar as matr√≠culas do arquivo, para garantir que o proxId ser√° correto
     loadFromFile(file);
 }
 
-// FunÁ„o para adicionar a matricula na fila
-void addFile(File* file, const char* cpf, int renach, const char* nome, const char* habil) {
-    Matricula* novo = criarMat(file->proxId, cpf, renach, nome, habil);
+// Fun√ß√£o para adicionar a matr√≠cula na fila
+void addFile(File* file, const char* habil, const char* cpf, const char* renach, const char* nome) {
+    Matricula* novo = criarMat(file->proxId, habil, cpf, renach, nome);
     if (file->fim == NULL) {
         file->inicio = novo;
         file->fim = novo;
@@ -56,65 +56,64 @@ void addFile(File* file, const char* cpf, int renach, const char* nome, const ch
         file->fim->prox = novo;
         file->fim = novo;
     }
-    printf("Matricula de '%s' adicionada ‡ fila.\n", nome);
-    file->proxId++; // Incrementa o proxId para o prÛximo
-    // Verifique os valores atribuÌdos:
-    printf("Nome: %s, HabilitaÁ„o: %s\n", novo->nome, novo->habil);
+    printf("Matr√≠cula de '%s' adicionada √† fila.\n", nome);
+    file->proxId++; // Incrementa o proxId para o pr√≥ximo
+    // Verifique os valores atribu√≠dos:
+    printf("Nome: %s, Habilita√ß√£o: %s, RENACH: %s\n", novo->nome, novo->habil, novo->renach);
 }
 
-// FunÁ„o para listar todas as matriculas na fila
+// Fun√ß√£o para listar todas as matr√≠culas na fila
 void listFile(File* file) {
     if (file->inicio == NULL) {
-        printf("A lista de matrÌculas est· vazia.\n");
+        printf("A lista de matr√≠culas est√° vazia.\n");
         return;
     }
     Matricula* temp = file->inicio;
-    printf("As matrÌculas na fila s„o:\n");
+    printf("As matr√≠culas na fila s√£o:\n");
     while (temp != NULL) {
-        printf("ID: %d, CPF: %s, Renach: BA%d, Nome: %s, HabilitaÁ„o: %s\n", temp->id, temp->cpf, temp->renach, temp->nome, temp->habil);
+        printf("ID: %d, CPF: %s, Nome: %s, Habilita√ß√£o: %s, RENACH: %s\n", temp->id, temp->cpf, temp->nome, temp->habil, temp->renach);
         temp = temp->prox;
     }
 }
 
-// FunÁ„o para editar uma matricula
+// Fun√ß√£o para editar uma matr√≠cula
 void editMatricula(File* file, int id) {
     Matricula* temp = file->inicio;
     while (temp != NULL) {
         if (temp->id == id) {
-            char nome[50], habil[50], cpf[15];
-            int renach;
+            char habil[50], cpf[20], renach[20], nome[50];
             printf("Digite o novo nome do aluno: ");
-            fgets(nome, sizeof(nome), stdin);
+            fgets(nome, sizeof(nome), stdin); 
             nome[strcspn(nome, "\n")] = 0;  // Remove a nova linha, se houver
 
             printf("Digite o novo CPF do aluno: ");
             fgets(cpf, sizeof(cpf), stdin);
-            cpf[strcspn(cpf, "\n")] = 0;  // Remove a nova linha, se houver
+            cpf[strcspn(cpf, "\n")] = 0;  
 
-            printf("Digite o novo Renach do aluno: BA");
-            scanf("%d", &renach);
-            getchar();  // Limpar o '\n' do buffer
-
-            printf("Digite a nova habilitaÁ„o do aluno: ");
+            printf("Digite a nova habilita√ß√£o do aluno: ");
             fgets(habil, sizeof(habil), stdin);
-            habil[strcspn(habil, "\n")] = 0;  // Remove a nova linha, se houver
+            habil[strcspn(habil, "\n")] = 0;  
 
-            // Verifique as atribuiÁıes
-            printf("Editando matrÌcula: Nome: %s, HabilitaÁ„o: %s\n", nome, habil);
+            printf("Digite o novo RENACH: ");
+            fgets(renach, sizeof(renach), stdin);
+            renach[strcspn(renach, "\n")] = 0;  
+
+            // Verifique as atribui√ß√µes
+            printf("Editando matr√≠cula: Nome: %s, Habilita√ß√£o: %s, RENACH: %s\n", nome, habil, renach);
 
             strcpy(temp->nome, nome);
             strcpy(temp->cpf, cpf);
-            temp->renach = renach;
             strcpy(temp->habil, habil);
-            printf("Matricula com ID %d editada com sucesso.\n", id);
+            strcpy(temp->renach, renach); 
+            printf("Matr√≠cula com ID %d editada com sucesso.\n", id);
             return;
         }
         temp = temp->prox;
     }
-    printf("Matricula com ID %d n„o encontrada.\n", id);
+    printf("Matr√≠cula com ID %d n√£o encontrada.\n", id);
 }
 
-// FunÁ„o para apagar uma matricula
+// Fun√ß√£o para apagar uma matr√≠cula
 void removeMatricula(File* file, int id) {
     Matricula* temp = file->inicio;
     Matricula* anterior = NULL;
@@ -133,16 +132,16 @@ void removeMatricula(File* file, int id) {
                 }
             }
             free(temp);
-            printf("MatrÌcula com ID %d removida com sucesso.\n", id);
+            printf("Matr√≠cula com ID %d removida com sucesso.\n", id);
             return;
         }
         anterior = temp;
         temp = temp->prox;
     }
-    printf("MatrÌcula com ID %d n„o encontrada.\n", id);
+    printf("Matr√≠cula com ID %d n√£o encontrada.\n", id);
 }
 
-// FunÁ„o para salvar as matriculas em um arquivo
+// Fun√ß√£o para salvar as matr√≠culas em um arquivo
 void saveToFile(File* file) {
     FILE* fp = fopen("matriculas.txt", "w");
     if (fp == NULL) {
@@ -152,129 +151,148 @@ void saveToFile(File* file) {
     Matricula* temp = file->inicio;
     while (temp != NULL) {
         // Verifique os valores antes de gravar no arquivo
-        printf("Salvando: ID=%d, CPF=%s, Renach=BA%d, Nome=%s, HabilitaÁ„o=%s\n", 
-               temp->id, temp->cpf, temp->renach, temp->nome, temp->habil);
+        printf("Salvando: ID=%d, CPF=%s, Nome=%s, Habilita√ß√£o=%s, RENACH=%s\n", 
+               temp->id, temp->cpf, temp->nome, temp->habil, temp->renach);
         
         // Grava no arquivo
-        fprintf(fp, "%d %s %d %s %s\n", temp->id, temp->cpf, temp->renach, temp->nome, temp->habil);
+        fprintf(fp, "%d %s %s %s %s\n", temp->id, temp->cpf, temp->habil, temp->renach, temp->nome);
         temp = temp->prox;
     }
     fclose(fp);
-    printf("MatrÌculas salvas com sucesso.\n");
+    printf("Matr√≠culas salvas com sucesso.\n");
 }
 
-// FunÁ„o para carregar as matriculas de um arquivo
+// Fun√ß√£o para carregar as matr√≠culas de um arquivo
 void loadFromFile(File* file) {
-    FILE* fp = fopen("matriculas.txt", "r");
+    FILE* fp = fopen("matriculas.txt", "r");  // Abrir o arquivo para leitura
     if (fp == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo para carregar.\n");
         return;
     }
 
-    char linha[1000]; // Buffer para ler as linhas
+    char linha[1000];  // Buffer para armazenar cada linha lida do arquivo
+    int idMax = file->proxId;  // Inicia o idMax com o valor de proxId
+
     while (fgets(linha, sizeof(linha), fp) != NULL) {
-        int id, renach;
-        char cpf[15], nome[50], habil[50];
+        int id;
+        char cpf[20], habil[100], renach[20], nome[100];
 
-        // Usando sscanf para ler id, cpf e renach (os trÍs primeiros campos)
-        if (sscanf(linha, "%d %s %d", &id, cpf, &renach) == 3) {
-            // Agora, encontrar a parte do nome (que pode ter espaÁos)
-            char* nomeStart = strchr(linha, ' ') + 1;  // Encontra o primeiro espaÁo apÛs o ID
-            nomeStart = strchr(nomeStart, ' ') + 1;     // Encontra o espaÁo apÛs o CPF
+        // Usar sscanf para ler os primeiros campos (id, cpf, habilita√ß√£o, renach)
+        if (sscanf(linha, "%d %s %s %s", &id, cpf, habil, renach) == 4) {
+        	// Foi necessario fazer o nome ser pulado varias vezes para n√£o dar problema na hora de colocar um nome longo, procurar outro metodo de resolver isso no futuro.
+            char* nomeInicio = strchr(linha, ' ');  // Pula o ID
+            nomeInicio = strchr(nomeInicio + 1, ' ');  // Pula o CPF
+            nomeInicio = strchr(nomeInicio + 1, ' ');  // Pula a Habilita√ß√£o
+            nomeInicio = strchr(nomeInicio + 1, ' ');  // Pula o RENACH
 
-            // Encontrar onde comeÁa a habilitaÁ„o (apÛs o nome)
-            char* habilStart = strrchr(linha, ' ') + 1; // Encontrar o ˙ltimo espaÁo na linha (antes da habilitaÁ„o)
+            if (nomeInicio != NULL) {
+                // O nome come√ßa ap√≥s o espa√ßo encontrado
+                strcpy(nome, nomeInicio + 1);  // Copiar o nome completo para que deixe de ter problema de separa√ß√£o no nome ou que ele apare√ßa em outras variaveis.
+                nome[strcspn(nome, "\n")] = 0;  // Remover a quebra de linha
+            }
 
-            // Agora, copiamos o nome e a habilitaÁ„o
-            int nomeLen = habilStart - nomeStart - 1;  // Calcula o comprimento do nome
-            strncpy(nome, nomeStart, nomeLen);         // Copia o nome para a vari·vel nome
-            nome[nomeLen] = '\0';                      // Garante que o nome est· corretamente finalizado
+            // Adiciona a matr√≠cula √† fila
+            addFile(file, habil, cpf, renach, nome);
 
-            // Copiar a habilitaÁ„o (o restante da linha apÛs o nome)
-            strcpy(habil, habilStart);
-
-            // Adiciona a matrÌcula ‡ fila
-            addFile(file, cpf, renach, nome, habil);
-
-            // Ajusta o proxId para o prÛximo n˙mero apÛs o maior id encontrado
-            if (id >= file->proxId) {
-                file->proxId = id + 1;
+            // Atualiza o proxId para garantir que seja maior que o ID atual
+            if (id >= idMax) {
+                idMax = id + 1;  // Ajusta proxId para o pr√≥ximo ID dispon√≠vel
             }
         }
     }
+
+    file->proxId = idMax;  // Ajusta o proxId ap√≥s carregar as matr√≠culas
     fclose(fp);
-    printf("MatrÌculas carregadas com sucesso.\n");
+    printf("Matr√≠culas carregadas com sucesso.\n");
 }
 
+// Fun√ß√£o para ler uma op√ß√£o do menu e verificar se √© v√°lida
+int lerOpcao() {
+    int opcao;
+    while (1) {
+        printf("Escolha uma op√ß√£o: ");
+        if (scanf("%d", &opcao) != 1) {
+            // Se a leitura falhar, limpa o buffer e pede para tentar novamente
+            while (getchar() != '\n');  // Limpa o buffer de entrada
+            printf("Op√ß√£o inv√°lida! Por favor, insira um n√∫mero entre 1 e 5.\n");
+        } else {
+            // Limpar o buffer de entrada ap√≥s ler a op√ß√£o
+            while (getchar() != '\n');  // Limpar o '\n' deixado no buffer
+            break; // Se a op√ß√£o foi lida com sucesso, sai do loop
+        }
+    }
+    return opcao;
+}
 
-// FunÁ„o Principal com o menu
+// Fun√ß√£o Principal com o menu
 int main() {
     setlocale(LC_ALL, "Portuguese");
     File file;
-    startFile(&file); // Carregar matrÌculas ao iniciar e definir proxId
+    startFile(&file);
 
-    char nome[50], habil[50], cpf[15];
-    int option, renach;
+    char nome[50], habil[50], cpf[20], renach[20];
 
-    while (1) {
-        printf("\nBem-vindo ao sistema.\n");
-        printf("Escolha uma das opÁıes:\n");
-        printf("1 - Adicionar MatrÌcula\n");
-        printf("2 - Mostrar MatrÌculas\n");
-        printf("3 - Editar MatrÌcula\n");
-        printf("4 - Apagar MatrÌcula\n");
-        printf("5 - Salvar MatrÌculas\n");
-        printf("6 - Sair\n");
-        scanf("%d", &option);
-        
-        while (getchar() != '\n');  // Limpa o buffer de entrada
+    int opcao;
+    do {
+        printf("\nMenu de op√ß√µes:\n");
+        printf("1. Adicionar Matr√≠cula\n");
+        printf("2. Listar Matr√≠culas\n");
+        printf("3. Editar Matr√≠cula\n");
+        printf("4. Remover Matr√≠cula\n");
+        printf("5. Salvar e Sair\n");
 
-        switch (option) {
+        opcao = lerOpcao();  // Chama a fun√ß√£o que garante a leitura correta da op√ß√£o
+
+        switch (opcao) {
             case 1:
+                // A seguir, use getchar() para limpar antes de capturar strings
+                printf("Digite a habilita√ß√£o: ");
+                fgets(habil, sizeof(habil), stdin);
+                habil[strcspn(habil, "\n")] = 0;  // Remove a nova linha
+
+                printf("Digite o CPF: ");
+                fgets(cpf, sizeof(cpf), stdin);
+                cpf[strcspn(cpf, "\n")] = 0;  // Remove a nova linha
+
                 printf("Digite o nome do aluno: ");
                 fgets(nome, sizeof(nome), stdin);
                 nome[strcspn(nome, "\n")] = 0;
 
-                printf("Digite o CPF do aluno: ");
-                fgets(cpf, sizeof(cpf), stdin);
-                cpf[strcspn(cpf, "\n")] = 0;
-                
-                printf("\nExemplo de Renach: BA712000000\n");
-                printf("Digite o Renach do aluno: BA");
-                scanf("%d", &renach);
-                getchar();  // Limpa o \n deixado pelo scanf
+                printf("Digite o RENACH: ");
+                fgets(renach, sizeof(renach), stdin);
+                renach[strcspn(renach, "\n")] = 0;
 
-                printf("\nObs: Primeira Categoria AB, A, B, AdiÁ„o de Categoria A, AdiÁ„o de Categoria B, MudanÁa de Categoria D.\n");
-                printf("Digite a categoria do aluno: ");
-                fgets(habil, sizeof(habil), stdin);
-                habil[strcspn(habil, "\n")] = 0;
-                
-                addFile(&file, cpf, renach, nome, habil);
+                addFile(&file, habil, cpf, renach, nome);
                 break;
+
             case 2:
                 listFile(&file);
                 break;
+
             case 3:
-                printf("Digite o ID da matrÌcula que deseja editar: ");
-                scanf("%d", &option);
-                getchar(); // Limpa o \n
-                editMatricula(&file, option);
+                printf("Digite o ID da matr√≠cula para editar: ");
+                int id;
+                scanf("%d", &id);
+                getchar();  // Limpa o \n deixado pelo scanf
+                editMatricula(&file, id);
                 break;
+
             case 4:
-                printf("Digite o ID da matrÌcula que deseja remover: ");
-                scanf("%d", &option);
-                removeMatricula(&file, option);
+                printf("Digite o ID da matr√≠cula para remover: ");
+                scanf("%d", &id);
+                getchar();  // Limpa o \n deixado pelo scanf
+                removeMatricula(&file, id);
                 break;
+
             case 5:
                 saveToFile(&file);
+                printf("Saindo...\n");
                 break;
-            case 6:
-                printf("Programa finalizado com sucesso.\n");
-                exit(0);
+
             default:
-                printf("OpÁ„o inv·lida.\n");
+                printf("Op√ß√£o inv√°lida! Tente novamente.\n");
         }
-    }
+    } while (opcao != 5);
+
     return 0;
 }
-
